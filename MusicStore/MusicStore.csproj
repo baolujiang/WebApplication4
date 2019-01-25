@@ -8,12 +8,12 @@
     <ProductVersion>
     </ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{240C927F-31D5-41DD-9CFB-24CD0C283181}</ProjectGuid>
+    <ProjectGuid>{FB8B7879-1ADA-4EBE-A23A-288A69B289AB}</ProjectGuid>
     <ProjectTypeGuids>{349c5851-65df-11da-9384-00065b846f21};{fae04ec0-301f-11d3-bf4b-00c04f79efbc}</ProjectTypeGuids>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>WebApplication4</RootNamespace>
-    <AssemblyName>WebApplication4</AssemblyName>
+    <RootNamespace>MusicStore</RootNamespace>
+    <AssemblyName>MusicStore</AssemblyName>
     <TargetFrameworkVersion>v4.7.1</TargetFrameworkVersion>
     <MvcBuildViews>false</MvcBuildViews>
     <UseIISExpress>true</UseIISExpress>
@@ -50,21 +50,6 @@
     </Reference>
     <Reference Include="EntityFramework.SqlServer, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
       <HintPath>..\packages\EntityFramework.6.2.0\lib\net45\EntityFramework.SqlServer.dll</HintPath>
-    </Reference>
-    <Reference Include="Glimpse.Ado, Version=1.7.3.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Glimpse.Ado.1.7.3\lib\net45\Glimpse.Ado.dll</HintPath>
-    </Reference>
-    <Reference Include="Glimpse.AspNet, Version=1.8.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Glimpse.AspNet.1.8.0\lib\net45\Glimpse.AspNet.dll</HintPath>
-    </Reference>
-    <Reference Include="Glimpse.Core, Version=1.8.6.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Glimpse.1.8.6\lib\net45\Glimpse.Core.dll</HintPath>
-    </Reference>
-    <Reference Include="Glimpse.EF6, Version=1.6.5.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Glimpse.EF6.1.6.5\lib\net45\Glimpse.EF6.dll</HintPath>
-    </Reference>
-    <Reference Include="Glimpse.Mvc5, Version=1.5.3.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Glimpse.Mvc5.1.5.3\lib\net45\Glimpse.Mvc5.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System" />
@@ -148,13 +133,49 @@
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="Controllers\AlbumsController.cs" />
+    <Compile Include="Controllers\ArtistsController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
-    <Compile Include="GlimpseSecurityPolicy.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201901231449020_Initial.cs" />
+    <Compile Include="Migrations\201901231449020_Initial.Designer.cs">
+      <DependentUpon>201901231449020_Initial.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201901231451327_change-schema.cs" />
+    <Compile Include="Migrations\201901231451327_change-schema.Designer.cs">
+      <DependentUpon>201901231451327_change-schema.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201901231500087_WithSeeds.cs" />
+    <Compile Include="Migrations\201901231500087_WithSeeds.Designer.cs">
+      <DependentUpon>201901231500087_WithSeeds.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201901231505160_Change-Reviewers.cs" />
+    <Compile Include="Migrations\201901231505160_Change-Reviewers.Designer.cs">
+      <DependentUpon>201901231505160_Change-Reviewers.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201901231512090_AddRating.cs" />
+    <Compile Include="Migrations\201901231512090_AddRating.Designer.cs">
+      <DependentUpon>201901231512090_AddRating.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201901231517009_MakeRatingNotNull.cs" />
+    <Compile Include="Migrations\201901231517009_MakeRatingNotNull.Designer.cs">
+      <DependentUpon>201901231517009_MakeRatingNotNull.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201901231639569_timestamp-column-added.cs" />
+    <Compile Include="Migrations\201901231639569_timestamp-column-added.Designer.cs">
+      <DependentUpon>201901231639569_timestamp-column-added.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\Album.cs" />
-    <Compile Include="Models\MusicStoreDbContext.cs" />
+    <Compile Include="Models\Artist.cs" />
+    <Compile Include="Models\ArtistDetail.cs" />
+    <Compile Include="Models\MusicStoreDataContext.cs" />
+    <Compile Include="Models\MusicStoreDataContextInitializer.cs" />
+    <Compile Include="Models\Repositories\ArtistRepository.cs" />
+    <Compile Include="Models\Repositories\Repository.cs" />
+    <Compile Include="Models\Reviewer.cs" />
+    <Compile Include="Models\SoloArtist.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -193,6 +214,10 @@
     <Content Include="Views\Home\About.cshtml" />
     <Content Include="Views\Home\Contact.cshtml" />
     <Content Include="Views\Home\Index.cshtml" />
+    <Content Include="Views\Artists\Index.cshtml" />
+    <Content Include="Views\Artists\Create.cshtml" />
+    <Content Include="Views\Artists\Details.cshtml" />
+    <Content Include="Views\Artists\Edit.cshtml" />
     <Content Include="Views\Albums\Create.cshtml" />
     <Content Include="Views\Albums\Delete.cshtml" />
     <Content Include="Views\Albums\Details.cshtml" />
@@ -215,6 +240,29 @@
     <Content Include="Scripts\jquery-3.3.1.slim.min.map" />
     <Content Include="Scripts\jquery-3.3.1.min.map" />
   </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Migrations\201901231449020_Initial.resx">
+      <DependentUpon>201901231449020_Initial.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201901231451327_change-schema.resx">
+      <DependentUpon>201901231451327_change-schema.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201901231500087_WithSeeds.resx">
+      <DependentUpon>201901231500087_WithSeeds.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201901231505160_Change-Reviewers.resx">
+      <DependentUpon>201901231505160_Change-Reviewers.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201901231512090_AddRating.resx">
+      <DependentUpon>201901231512090_AddRating.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201901231517009_MakeRatingNotNull.resx">
+      <DependentUpon>201901231517009_MakeRatingNotNull.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201901231639569_timestamp-column-added.resx">
+      <DependentUpon>201901231639569_timestamp-column-added.cs</DependentUpon>
+    </EmbeddedResource>
+  </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
@@ -231,9 +279,9 @@
         <WebProjectProperties>
           <UseIIS>True</UseIIS>
           <AutoAssignPort>True</AutoAssignPort>
-          <DevelopmentServerPort>55058</DevelopmentServerPort>
+          <DevelopmentServerPort>21849</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
-          <IISUrl>http://localhost:55058/</IISUrl>
+          <IISUrl>http://localhost:21849/</IISUrl>
           <NTLMAuthentication>False</NTLMAuthentication>
           <UseCustomServer>False</UseCustomServer>
           <CustomServerUrl>
