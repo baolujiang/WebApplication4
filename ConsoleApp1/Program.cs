@@ -3,8 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Reflection;
 
+using Microsoft.Office.Core;
 using Microsoft.Office.Interop.Word;
+
+using WordLibrary;
 
 namespace ConsoleApp1
 {
@@ -12,15 +16,12 @@ namespace ConsoleApp1
     {
         static void Main(string[] args)
         {
-            //var app = new Application();
-            //string path = Environment.CurrentDirectory;
-            //string filePath = System.IO.Path.Combine(path, "doc1.docx");
-            //string outputfilepath = System.IO.Path.Combine(path, "doc1.pdf");
-            //var doc = app.Documents.Open(filePath);
-            //doc.SaveAs2(outputfilepath, FileFormat: WdSaveFormat.wdFormatPDF);
-            //app.Quit();
 
-            CreateTestDoc();
+            var fileCleaner = new TempFilesCleaner();
+            fileCleaner.DeleteFilesOlderThan(DateTime.Now.AddDays(-1));
+
+            Console.WriteLine("Document Combined");
+            Console.WriteLine("Press any key to continue");
 
             Console.ReadLine();
 
@@ -33,10 +34,16 @@ namespace ConsoleApp1
             string filePath = System.IO.Path.Combine(path, "doc2");
             var doc = app.Documents.Add();
 
-            var section1=doc.Sections[1];
-            
+            var section1 = doc.Sections[1];
+
             section1.Borders[WdBorderType.wdBorderLeft].Visible = true;
-            section1.Borders[WdBorderType.wdBorderLeft].LineWidth = WdLineWidth.wdLineWidth300pt;
+            section1.Borders[WdBorderType.wdBorderLeft].LineWidth = WdLineWidth.wdLineWidth100pt;
+            section1.Borders[WdBorderType.wdBorderRight].Visible = true;
+            section1.Borders[WdBorderType.wdBorderRight].LineWidth = WdLineWidth.wdLineWidth100pt;
+            section1.Borders[WdBorderType.wdBorderTop].Visible = true;
+            section1.Borders[WdBorderType.wdBorderTop].LineWidth = WdLineWidth.wdLineWidth100pt;
+            section1.Borders[WdBorderType.wdBorderBottom].Visible = true;
+            section1.Borders[WdBorderType.wdBorderBottom].LineWidth = WdLineWidth.wdLineWidth100pt;
 
             section1.PageSetup.Orientation = WdOrientation.wdOrientPortrait;
             section1.PageSetup.LeftMargin = app.InchesToPoints(1.5f);
@@ -47,11 +54,17 @@ namespace ConsoleApp1
 
             var header = section1.Headers[WdHeaderFooterIndex.wdHeaderFooterPrimary];
             var pa = header.Range.Paragraphs.Add();
-            pa.Range.Text = "This is the first paragraph in header";
-            pa.Alignment = WdParagraphAlignment.wdAlignParagraphRight;
-            pa.Range.Font.Bold = 1;
+            pa.Range.InlineShapes.AddPicture(FileName: @"C:\Users\bjiang\Pictures\test.png", LinkToFile: false, SaveWithDocument: true);
+            pa.Range.InlineShapes[1].LockAspectRatio = MsoTriState.msoCTrue;
+            pa.Range.InlineShapes[1].ScaleHeight = app.CentimetersToPoints(1);
+            pa.Range.InsertAfter("This is some text after the picture.");
 
-            var contentParagraph=section1.Range.Paragraphs.Add();
+            var pa1 = header.Range.Paragraphs.Add();
+            pa1.Range.Text = "This is the first paragraph in header";
+            pa1.Alignment = WdParagraphAlignment.wdAlignParagraphRight;
+            pa1.Range.Font.Bold = 1;
+
+            var contentParagraph = section1.Range.Paragraphs.Add();
 
             contentParagraph.SpaceBefore = 48;
             contentParagraph.SpaceAfter = 48;
@@ -64,10 +77,10 @@ namespace ConsoleApp1
             object oEndOfDoc = "\\endofdoc";
 
             Range wrdRng = doc.Bookmarks.get_Item(oEndOfDoc).Range;
-        
+
             var oTable = doc.Tables.Add(wrdRng, 3, 5);
             oTable.Range.ParagraphFormat.SpaceAfter = 6;
-            oTable.Range.ParagraphFormat.SpaceBefore=6;
+            oTable.Range.ParagraphFormat.SpaceBefore = 6;
 
             oTable.Rows.Alignment = WdRowAlignment.wdAlignRowCenter;
 
@@ -92,7 +105,7 @@ namespace ConsoleApp1
 
             oTable.Range.Paragraphs.Alignment = WdParagraphAlignment.wdAlignParagraphCenter;
 
-  
+
             var contentPa2 = section1.Range.Paragraphs.Add();
 
             contentPa2.SpaceBefore = 48;
@@ -120,7 +133,7 @@ namespace ConsoleApp1
             pa2.Range.Font.StrikeThrough = 1;
 
             var section2 = doc.Sections.Add();
-            section2.PageSetup.Orientation = WdOrientation.wdOrientLandscape;
+            //section2.PageSetup.Orientation = WdOrientation.wdOrientLandscape;
 
             var header2 = section1.Headers[WdHeaderFooterIndex.wdHeaderFooterPrimary];
             var pa02 = header.Range.Paragraphs.Add();
@@ -135,10 +148,37 @@ namespace ConsoleApp1
             contentParagraph2.Range.Text = "This is paragraph 1";
             contentParagraph2.Range.InsertParagraphAfter();
 
+            AddWaterMark(doc, section2);
 
             doc.SaveAs2(filePath, FileFormat: WdSaveFormat.wdFormatDocument);
             app.Quit();
 
+        }
+
+        static void AddWaterMark(Document doc, Section section)
+        {
+
+            section.Range.Select();
+
+            section.Headers[WdHeaderFooterIndex.wdHeaderFooterPrimary].
+                Shapes.AddPicture(FileName: @"C:\Users\bjiang\Pictures\test.png",
+                LinkToFile: false, SaveWithDocument: true).Select();
+
+            var Selection = doc.ActiveWindow.ActivePane.Selection;
+
+            Selection.ShapeRange.Name = "WordPictureWatermark32603288";
+            Selection.ShapeRange.PictureFormat.Brightness = 0.85f;
+            Selection.ShapeRange.PictureFormat.Contrast = 0.15f;
+            Selection.ShapeRange.LockAspectRatio = MsoTriState.msoFalse;
+            Selection.ShapeRange.HeightRelative = 100;
+            Selection.ShapeRange.WidthRelative = 100;
+            //    Selection.ShapeRange.WrapFormat.AllowOverlap = -1;
+            //    Selection.ShapeRange.WrapFormat.Side = WdWrapSideType.wdWrapBoth;
+            //    Selection.ShapeRange.WrapFormat.Type = WdWrapType.wdWrapFront;
+            Selection.ShapeRange.RelativeHorizontalPosition = WdRelativeHorizontalPosition.wdRelativeHorizontalPositionMargin;
+            Selection.ShapeRange.RelativeVerticalPosition = WdRelativeVerticalPosition.wdRelativeVerticalPositionMargin;
+            Selection.ShapeRange.Left = 0;
+            Selection.ShapeRange.Top = 0;
         }
     }
 }
