@@ -16,14 +16,24 @@ namespace WordLibrary
             App = new Application();
         }
 
+        public void Convert2Pdf(string pdfFile, string wordFile)
+        {
+
+            var doc = App.Documents.Open(FileName: wordFile, ReadOnly: true);
+            doc.ExportAsFixedFormat(OutputFileName: pdfFile, ExportFormat: WdExportFormat.wdExportFormatPDF);
+            doc.Close(SaveChanges: false);
+
+            Dispose();
+
+        }
+
+
         public void Convert2Pdf(string directory, string pdfFile, string wordFile)
         {
             var wordFilePath = System.IO.Path.Combine(directory, wordFile);
             var pdfFilePath = System.IO.Path.Combine(directory, pdfFile);
 
-            var doc = App.Documents.Open(FileName: wordFilePath, ReadOnly: true);
-            doc.ExportAsFixedFormat(OutputFileName: pdfFilePath, ExportFormat: WdExportFormat.wdExportFormatPDF);
-            doc.Close(SaveChanges: false);
+            Convert2Pdf(pdfFilePath, wordFilePath);
 
             Dispose();
 

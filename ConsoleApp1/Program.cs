@@ -9,6 +9,7 @@ using Microsoft.Office.Core;
 using Microsoft.Office.Interop.Word;
 
 using WordLibrary;
+using System.IO;
 
 namespace ConsoleApp1
 {
@@ -17,8 +18,99 @@ namespace ConsoleApp1
         static void Main(string[] args)
         {
 
-            var fileCleaner = new TempFilesCleaner();
-            fileCleaner.DeleteFilesOlderThan(DateTime.Now.AddDays(-1));
+            var docBuilder = new DocBuilder();
+
+            docBuilder.SetDefaultFonts("Times New Roman", 11);
+            docBuilder.SetOrientation(Orientation.Landscape);
+            docBuilder.SetPageMargins_in_Inches(top: 1.25f);
+
+            var logoFile = Path.Combine(GetCurrentDirectory(), @"logo.gif");
+            docBuilder.SetPageHeader(logoFile, new List<string> { "row 1", "Row 2", "row 3" });
+
+            docBuilder.SetPageFooter(new List<string> { "Confidential Information",
+                "The information in this study report is legally privileged and confidential.  Any disclosure, copying or distribution of the information contained within is strictly prohibited without written consent from the sponsor and Pharma Medica Research Inc."
+                });
+
+            docBuilder.SetTableFontSizes(titleFontSize: 12, tableFontSize: 10, notesFontSize: 9);
+
+            var tableNumber = "1";
+            var tableTitle = "Final Plasma Concentrations of Moxifloxacin(ng / mL), Period 1";
+
+            docBuilder.SetTableTitle_FirstPage(tableNumber, tableTitle);
+            docBuilder.CreateTable(1, 6);
+
+            string[,] headerRows =
+            {
+                {"S","Sampling Time Hours",null,null,null,null },
+                {null, "1","2","3","4","5" }
+            };
+
+
+            docBuilder.AddTableHeaderRows(headerRows);
+
+            docBuilder.MergeCells(1, 1, 2, 1);
+            docBuilder.MergeCells(1, 2, 1, null);
+
+            string[,] contentRows =
+            {
+                {"001","1.01","2.01","3.01","4.01","5.0" },
+                {"001","1.01","2.01","3.01","4.01","5.0" },
+                {"001","1.01","2.01","3.01","4.01","5.0" },
+                {null, "1","2","3","4","5" }
+            };
+
+            docBuilder.AddTableContents(contentRows);
+            docBuilder.AddTableContents(contentRows);
+            docBuilder.AddTableContents(contentRows);
+
+            string[,] summaryRows =
+{
+                {"Summary","1.01","2.01","3.01","4.01","5.0" },
+                {null,"1.01","2.01","Intentionally Blank",null,"5.0" },
+                {null,"1.01","2.01",null,null,"5.0" },
+                {null, "5.01","2.06",null,null,"5" }
+            };
+
+            docBuilder.AddTableContents(summaryRows);
+
+            docBuilder.MergeCells(2, 4, null, 5);
+            docBuilder.MergeCells(1, 1, null, 1);
+
+            docBuilder.AddPageBreak();
+
+            docBuilder.SetTableTitle_Continued(tableNumber, tableTitle);
+
+            docBuilder.CreateTable(1, 6);
+            docBuilder.AddTableHeaderRows(headerRows);
+
+            docBuilder.MergeCells(1, 1, 2, 1);
+            docBuilder.MergeCells(1, 2, 1, null);
+
+            docBuilder.AddTableContents(contentRows);
+            docBuilder.AddTableContents(contentRows);
+            docBuilder.AddTableContents(contentRows);
+
+            docBuilder.AddTableContents(summaryRows);
+
+            docBuilder.MergeCells(2, 4, null, 5);
+            docBuilder.MergeCells(1, 1, null, 1);
+
+            var notes = new[] {
+                "BLQ: Below the lower limit of quantitation(5.00 ng / mL)",
+                "MS: Missing sample",
+                "Calibration Range: 5.00 ng / mL - 5000 ng / mL",
+                "S: Subject."
+            };
+
+            docBuilder.AddTableNotes(notes);
+
+            docBuilder.DeleteLastPageIfEmpty();
+
+            docBuilder.ShowDocument();
+
+
+
+            //PlayWithRange();
 
             Console.WriteLine("Document Combined");
             Console.WriteLine("Press any key to continue");
@@ -27,12 +119,90 @@ namespace ConsoleApp1
 
         }
 
+
+
+        static string GetCurrentDirectory()
+        {
+            var path = System.Reflection.Assembly.GetExecutingAssembly().Location;
+            return Path.GetDirectoryName(path);
+        }
+
+        static void PlayWithRange()
+        {
+            var app = new Application();
+            var doc = app.Documents.Add();
+            app.Visible = true;
+
+            var rng = doc.Content;
+            rng.Text = "Para 1" + Environment.NewLine +
+                    "Para 2" + Environment.NewLine +
+                    "Para 3";
+            rng.Select();
+
+            rng = rng.Paragraphs[2].Range;
+            //rng.Collapse(WdCollapseDirection.wdCollapseEnd);
+            rng.Select();
+
+            rng.InsertParagraphBefore();
+            rng.Select();
+
+            rng.InsertBefore("This is the text that replaced paragraph 2");
+            rng.Select();
+
+            rng.InsertParagraphAfter();
+            rng.Select();
+
+            rng.Collapse(WdCollapseDirection.wdCollapseEnd);
+            rng.Text = "New Text after insert";
+            rng.Select();
+
+            #region Insert Break;
+            //Insert PageBreak;
+
+            //rng = doc.Content.Paragraphs[2].Range;
+            //rng.Select();
+            //// rng.Collapse(WdCollapseDirection.wdCollapseEnd);
+
+            //rng.InsertBreak(WdBreakType.wdSectionBreakNextPage);
+            //rng.Select();
+
+            //rng.InsertAfter("|After Page Break|");
+            //rng.Select(); 
+            #endregion
+
+            #region InsertAfter and InsertBefore
+            //Method: InsertAfter, InsertBefore
+            //rng = doc.Content.Paragraphs[1].Range;
+            //rng.Select();
+
+            //rng.End -= 1;
+
+            //rng.InsertAfter("|After|");
+            //rng.Select();
+
+            //rng = doc.Content;
+            //rng.Collapse(WdCollapseDirection.wdCollapseEnd);
+
+
+            //rng.InsertBefore("|Before|");
+            //rng.Select();
+
+            #endregion
+
+            doc.Close(SaveChanges: false);
+
+            app.Quit();
+
+        }
+
         static void CreateTestDoc()
         {
             var app = new Application();
             string path = Environment.CurrentDirectory;
             string filePath = System.IO.Path.Combine(path, "doc2");
+
             var doc = app.Documents.Add();
+            app.Visible = true;
 
             var section1 = doc.Sections[1];
 

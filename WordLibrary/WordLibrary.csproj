@@ -54,6 +54,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Doc2Pdf.cs" />
+    <Compile Include="DocBuilder.cs" />
     <Compile Include="DocMerger.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
